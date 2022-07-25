@@ -20,7 +20,6 @@ class Agent():
         self.num_actions = num_actions
 
     def calc_loss(self, s, a, r, s_tag):
-        self.g_t = self.g_t * self.gamma + r
         return -torch.sum(self.lr * torch.log(self.policy(s)) * self.g_t)
 
     def choose(self, s):
@@ -31,12 +30,12 @@ class Agent():
     def update(self, state_list, action, new_state, reward_list):
         self.g_t = 0
         for state, reward in zip(reversed(state_list), reversed(reward_list)):
-            pseudo_loss = self.calc_loss(state, action, reward, new_state)
-
-            # update policy weights
-            self.optimizer.zero_grad()
-            pseudo_loss.backward()
-            self.optimizer.step()
+            self.g_t = self.g_t * self.gamma + reward
+        pseudo_loss = self.calc_loss(state, action, reward, new_state)
+        # update policy weights
+        self.optimizer.zero_grad()
+        pseudo_loss.backward()
+        self.optimizer.step()
 
 
 if __name__ == "__main__":
