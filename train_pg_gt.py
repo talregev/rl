@@ -49,5 +49,5 @@ if __name__ == "__main__":
     k = 10
     seed = 42
     agent = Agent(lr, gamma, k)
-    controller = Controller(agent, episodes, episode_step, gamma, lr, p_array, seed)
-    controller.train()
+    controller = Controller(agent, episodes, episode_step, gamma, p_array, seed)
+    controller.train_mc()

@@ -80,11 +80,10 @@ class QValue(nn.Module):
 
 class Controller:
 
-    def __init__(self, agent, episodes, episode_step, gamma, lr, p_array, seed) -> None:
+    def __init__(self, agent, episodes, episode_step, gamma, p_array, seed) -> None:
         self.episodes = episodes
         self.episode_step = episode_step
         self.gamma = gamma
-        self.lr = lr
         self.p_array = p_array
         self.seed = seed
         self.rand_generator = np.random.RandomState(np.random.seed(self.seed))
@@ -96,7 +95,23 @@ class Controller:
         self.env = Environment(self.matrix_transition, self.rand_generator)
         self.returns = deque(maxlen=100)
 
-    def train(self):
+    def train_td0(self):
+        # reset environment
+        state = self.env.reset()
+        for n_episode in range(self.episodes):
+            rewards = []
+            for _ in range(self.episode_step):
+                action = self.agent.choose(state)
+                new_state, reward = self.env.step(action)
+                state = new_state
+                self.agent.update(state, action, new_state, reward)
+                rewards.append(reward)
+
+            # calculate average return and print it out
+            self.returns.append(np.sum(rewards))
+            print(f"Episode: {n_episode:6d}\tAvg. Return: { np.mean(self.returns):6.2f}")
+
+    def train_mc(self):
         # reset environment
         state = self.env.reset()
         for n_episode in range(self.episodes):
