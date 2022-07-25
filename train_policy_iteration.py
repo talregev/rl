@@ -57,9 +57,8 @@ class Policy(nn.Module):
 
 class Agent():
 
-    def __init__(self, matrix_transition, lr, gamma, theta) -> None:
+    def __init__(self, matrix_transition, gamma, theta) -> None:
         self.matrix_transition = matrix_transition
-        self.lr = lr
         self.gamma = gamma
         self.theta = theta
         self.g_t = 0
@@ -168,12 +167,11 @@ if __name__ == "__main__":
     episodes = 500000
     episode_step = 20
     gamma = 0.9
-    lr = 0.1
     p_array = [0.9, 0.1]
     seed = 42
     theta = 0.001
     matrix_transition = Environment.build_matrix_transition(p_array)
-    agent = Agent(matrix_transition, lr, gamma, theta)
+    agent = Agent(matrix_transition, gamma, theta)
     matrix_shape = matrix_transition.shape
     agent.set_num_states_action(matrix_shape[1], matrix_shape[0])
     policy_stable = False
@@ -183,3 +181,6 @@ if __name__ == "__main__":
         print(f'step: {step}')
         step += 1
     print('finish')
+    print(agent.policy)
+    print(agent.value)
+    print(matrix_transition)
