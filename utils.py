@@ -115,17 +115,19 @@ class Controller:
         # reset environment
         state = self.env.reset()
         for n_episode in range(self.episodes):
-            rewards = []
-            states = []
+            rewards_list = []
+            states_list = []
+            actions_list = []
             for _ in range(self.episode_step):
-                states.append(state)
+                states_list.append(state)
                 action = self.agent.choose(state)
-                new_state, reward = self.env.step(action)
-                state = new_state
-                rewards.append(reward)
-            self.agent.update(states, action, new_state, rewards)
+                state_next, reward = self.env.step(action)
+                state = state_next
+                rewards_list.append(reward)
+                actions_list.append(action)
+            self.agent.step(states_list, actions_list, rewards_list)
             state = self.env.reset()
 
             # calculate average return and print it out
-            self.returns.append(np.sum(rewards))
+            self.returns.append(np.sum(rewards_list))
             print(f"Episode: {n_episode:6d}\tAvg. Return: { np.mean(self.returns):6.2f}")
