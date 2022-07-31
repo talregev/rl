@@ -68,8 +68,6 @@ class Agent():
 if __name__ == "__main__":
     print("tal")
 
-    episodes = 500000
-    episode_step = 20
     gamma = 0.9
     p_array = [0.9, 0.1]
     seed = 42
