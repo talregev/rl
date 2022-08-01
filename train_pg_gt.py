@@ -1,50 +1,11 @@
-import torch
-from utils import Controller, Policy
-
-
-class Agent():
-
-    def __init__(self, lr, gamma, k) -> None:
-
-        self.lr = lr
-        self.gamma = gamma
-        self.k = k
-
-    def set_generator(self, rand_generator):
-        self.rand_generator = rand_generator
-
-    def set_num_states_action(self, num_states, num_actions):
-        self.policy = Policy(self.k, num_states, num_actions)
-        self.optimizer = torch.optim.Adam(self.policy.parameters())
-        self.num_actions = num_actions
-
-    def calc_loss(self, s, gamma_t, g_t):
-        return -torch.sum(self.lr * gamma_t * g_t * torch.log(self.policy(s)))
-
-    def choose(self, s):
-        p = self.policy(s).cpu().detach().numpy()
-        a = self.rand_generator.choice(list(range(self.num_actions)), p=p)
-        return a
-
-    def step(self, state_list, action_list, reward_list):
-        gamma_t = 1
-        for t in range(len(state_list)):
-            g_t = 0
-            for k in reversed(range(t, len(state_list))):
-                g_t = g_t * self.gamma + reward_list[k]
-            state = state_list[t]
-            # action = action_list[t]
-            # reward = reward_list[t]
-            pseudo_loss = self.calc_loss(state, gamma_t, g_t)
-            # update policy weights
-            self.optimizer.zero_grad()
-            pseudo_loss.backward()
-            self.optimizer.step()
-            gamma_t *= self.gamma
-
+import numpy as np
+from agents.pg_gt import Agent
+from controllers.controller import Controller
+from networks.policy import Policy
+from environments.simple_mdp import Environment
 
 if __name__ == "__main__":
-    print("tal")
+    print("train policy gradient gt")
 
     episodes = 500000
     episode_step = 20
@@ -53,6 +14,11 @@ if __name__ == "__main__":
     p_array = [0.9, 0.1]
     k = 10
     seed = 42
-    agent = Agent(lr, gamma, k)
-    controller = Controller(agent, episodes, episode_step, gamma, p_array, seed)
+    rand_generator = np.random.RandomState(np.random.seed(seed))
+    matrix_transition = Environment.build_matrix_transition(p_array)
+    env = Environment(matrix_transition, rand_generator)
+    num_states, num_actions = env.get_num_states_actions()
+    policy = Policy(k, num_states, num_actions)
+    agent = Agent(rand_generator, num_states, num_actions, policy, lr, gamma)
+    controller = Controller(env, agent, episodes, episode_step)
     controller.train_mc()
