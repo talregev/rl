@@ -12,8 +12,8 @@ class Agent():
         self.policy = policy
         self.optimizer = torch.optim.Adam(self.policy.parameters())
 
-    def calc_loss(self, s, gamma_t, g_t):
-        return -torch.sum(self.lr * gamma_t * g_t * torch.log(self.policy(s)))
+    def calc_loss(self, state, action, gamma_t, g_t):
+        return -(self.lr * gamma_t * g_t * torch.log(self.policy(state)[action]))
 
     def choose(self, s):
         p = self.policy(s).cpu().detach().numpy()
@@ -27,7 +27,8 @@ class Agent():
             for k in reversed(range(t, len(state_list))):
                 g_t = g_t * self.gamma + reward_list[k]
             state = state_list[t]
-            pseudo_loss = self.calc_loss(state, gamma_t, g_t)
+            action = action_list[t]
+            pseudo_loss = self.calc_loss(state, action, gamma_t, g_t)
             # update policy weights
             self.optimizer.zero_grad()
             pseudo_loss.backward()
