@@ -1,7 +1,7 @@
 import torch
 
 
-class Agent():
+class AgentPolicyGradientGt():
 
     def __init__(self, rand_generator, num_states, num_actions, policy: torch.nn.Module, lr, gamma) -> None:
         self.num_states = num_states

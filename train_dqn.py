@@ -1,17 +1,18 @@
 import numpy as np
-from agents.pg_gt import AgentPolicyGradientGt
+from agents.dqn import AgentDQN
 from controllers.controller import Controller
-from networks.policy import Policy
+from networks.qvalue import QValue
 from environments.environment import Environment
 from mdps.simple_mdp import SimpleMDP
 
 if __name__ == "__main__":
-    print("train policy gradient gt")
+    print("dqn")
 
-    episodes = 500000
+    episodes = 5000
     episode_step = 20
-    gamma = 0.99
-    lr = 0.3
+    gamma = 0.8
+    epsilon = 0.05
+    lr = 0.1
     p_array = [0.9, 0.1]
     k = 10
     seed = 42
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     matrix_transition = SimpleMDP.build_matrix_transition(p_array)
     env = Environment(matrix_transition, rand_generator)
     num_states, num_actions = env.get_num_states_actions()
-    policy = Policy(k, num_states, num_actions)
-    agent = AgentPolicyGradientGt(rand_generator, num_states, num_actions, policy, lr, gamma)
+    q_network = QValue(k, num_states, num_actions)
+    agent = AgentDQN(rand_generator, q_network, num_states, num_actions, lr, gamma, epsilon)
     controller = Controller(env, agent, episodes, episode_step)
-    controller.train_mc()
+    controller.train_td0()
