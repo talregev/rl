@@ -3,7 +3,7 @@ from agents.dqn import AgentDQN
 from controllers.controller import Controller
 from networks.qvalue import QValue
 from environments.environment import Environment
-from mdps.simple_mdp import SimpleMDP
+from mdps.simple import SimpleMDP
 
 if __name__ == "__main__":
     print("dqn")

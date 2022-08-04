@@ -15,9 +15,10 @@ class Environment(gym.Env):
         return self.s
 
     def step(self, action):
-        state = self.rand_generator.choice(self.all_state, p=self.transition[action][self.s])
+        state = self.rand_generator.choice(self.all_state, p=self.transition[action][self.s][..., 0])
+        reward = self.transition[action][self.s][state][1]
         self.s = state
-        return self.s, self.s
+        return state, reward
 
     def get_num_states_actions(self):
         matrix_shape = self.transition.shape
