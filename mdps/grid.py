@@ -19,13 +19,9 @@ class GridMDP():
             column = i % grid_w
             if column > 0:
                 action_left[i][i - 1][0] = p
-            else:
-                action_left[i][i][0] = p
-
-            if column < (grid_w - 1):
-                action_left[i][i + 1][0] = 1 - p
-            else:
                 action_left[i][i][0] = 1 - p
+            else:
+                action_left[i][i][0] = 1
 
         matrix_transition[0] = action_left
 
@@ -36,13 +32,9 @@ class GridMDP():
 
             if column < (grid_w - 1):
                 action_right[i][i + 1][0] = p
-            else:
-                action_right[i][i][0] = p
-
-            if column > 0:
-                action_right[i][i - 1][0] = 1 - p
-            else:
                 action_right[i][i][0] = 1 - p
+            else:
+                action_right[i][i][0] = 1
 
         matrix_transition[1] = action_right
 
@@ -53,13 +45,9 @@ class GridMDP():
 
             if row > 0:
                 action_up[i][i - grid_w][0] = p
-            else:
-                action_up[i][i][0] = p
-
-            if row < (grid_h - 1):
-                action_up[i][i + grid_w][0] = 1 - p
-            else:
                 action_up[i][i][0] = 1 - p
+            else:
+                action_up[i][i][0] = 1
 
         matrix_transition[2] = action_up
 
@@ -70,13 +58,9 @@ class GridMDP():
 
             if row < (grid_h - 1):
                 action_down[i][i + grid_w][0] = p
-            else:
-                action_down[i][i][0] = p
-
-            if row > 0:
-                action_down[i][i - grid_w][0] = 1 - p
-            else:
                 action_down[i][i][0] = 1 - p
+            else:
+                action_down[i][i][0] = 1
 
         matrix_transition[3] = action_down
 
