@@ -14,15 +14,15 @@ class Controller:
         self.writer = SummaryWriter()
 
     def train_td0(self):
-        # reset environment
-        state = self.env.reset()
         for n_episode in range(self.episodes):
+            # reset environment
+            state = self.env.reset()
             rewards_list = []
             for _ in range(self.episode_step):
                 action = self.agent.choose(state)
                 new_state, reward = self.env.step(action)
-                state = new_state
                 self.agent.step(state, action, new_state, reward)
+                state = new_state
                 rewards_list.append(reward)
 
             sum_episode = np.sum(rewards_list)

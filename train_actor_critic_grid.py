@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     episodes = 50000
     episode_step = 7
-    lr_reward = 0.3
+    lr_reward = 0.9
     lr_critic = 0.3
     lr_actor = 0.3
     p_array = [0.9, 0.1]
