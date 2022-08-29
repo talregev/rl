@@ -57,3 +57,25 @@ class Controller:
             print(f"Episode: {n_episode:6d}\tAvg. Return: {avg_sum_episode:6.2f}")
             self.writer.add_scalar("train/sum", sum_episode, n_episode)
             self.writer.add_scalar("train/avg", avg_sum_episode, n_episode)
+
+    def train_replay(self):
+        for n_episode in range(self.episodes):
+            # reset environment
+            state = self.env.reset()
+            rewards_list = []
+            for _ in range(self.episode_step):
+                action = self.agent.choose(state)
+                new_state, reward = self.env.step(action)
+                self.agent.push(state, action, new_state, reward)
+                self.agent.step()
+                state = new_state
+                rewards_list.append(reward)
+
+            sum_episode = np.sum(rewards_list)
+            # calculate average return and print it out
+            self.returns.append(sum_episode)
+            avg_sum_episode = np.mean(self.returns)
+            print(f"Episode: {n_episode:6d}\tAvg. Return: { avg_sum_episode:6.2f}")
+            self.writer.add_scalar("train/sum", sum_episode, n_episode)
+            self.writer.add_scalar("train/avg", avg_sum_episode, n_episode)
+        pass

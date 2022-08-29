@@ -17,7 +17,7 @@ class QValue(nn.Module):
     def forward(self, s, a):
         input_s = F.one_hot(torch.tensor(s), num_classes=self.num_states).float()
         input_a = F.one_hot(torch.tensor(a), num_classes=self.num_actions).float()
-        x = torch.cat((input_s, input_a))
+        x = torch.cat((input_s, input_a), -1)
         x = self.fc1(x)
         # Use the rectified-linear activation function over x
         x = F.relu(x)
