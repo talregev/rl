@@ -35,7 +35,7 @@ class AgentDQNReplay():
     def choose(self, s):
         a = None
         if self.rand_generator.random() < self.epsilon:
-            a = self.rand_generator.choice(list(range(self.num_actions)))
+            a = self.rand_generator.choice(self.num_actions)
         else:
             values = []
             for a_ in range(self.num_actions):

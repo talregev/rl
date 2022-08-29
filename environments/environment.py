@@ -8,14 +8,14 @@ class Environment(gym.Env):
         self.s = 0
         self.rand_generator = rand_generator
         self.transition = np.array(matrix_transition)
-        self.all_state = np.arange(self.transition.shape[1])
+        self.num_state = self.transition.shape[1]
 
     def reset(self, seed=None, return_info=False, options=None):
         self.s = 0
         return self.s
 
     def step(self, action):
-        state = self.rand_generator.choice(self.all_state, p=self.transition[action][self.s][..., 0])
+        state = self.rand_generator.choice(self.num_state, p=self.transition[action][self.s][..., 0])
         reward = self.transition[action][self.s][state][1]
         self.s = state
         return state, reward

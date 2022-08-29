@@ -35,7 +35,7 @@ class AgentActorCritic():
 
     def choose(self, s):
         p = self.policy(s).cpu().detach().numpy()
-        a = self.rand_generator.choice(list(range(self.num_actions)), p=p)
+        a = self.rand_generator.choice(self.num_actions, p=p)
         return a
 
     def step(self, state, action, new_state, reward):
