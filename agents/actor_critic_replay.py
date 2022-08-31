@@ -28,7 +28,7 @@ class AgentActorCriticReplay():
         self.optimizer_critic = torch.optim.Adam(self.value.parameters())
         self.optimizer_actor = torch.optim.Adam(self.policy.parameters())
         self.criterion = nn.SmoothL1Loss()
-        self.reward_tag = 0
+        self.average_reward = 0
         self.replay = ReplayMemory(capacity, rand_generator)
         self.batch_size = batch_size
 
@@ -73,9 +73,9 @@ class AgentActorCriticReplay():
             next_state_batch = torch.cat(batch.next_state)
 
             delta = torch.sum(
-                reward_batch.unsqueeze(-1) - self.reward_tag + self.value(next_state_batch) -
+                reward_batch.unsqueeze(-1) - self.average_reward + self.value(next_state_batch) -
                 self.value(state_batch)).item()
-            self.reward_tag += self.lr_reward * delta
+            self.average_reward += self.lr_reward * delta
 
             self.update_critic(delta, state_batch)
             self.update_actor(delta, state_batch, action_batch)
