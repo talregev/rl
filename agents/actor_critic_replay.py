@@ -55,35 +55,35 @@ class AgentActorCriticReplay():
     def step(self):
         if len(self.replay) < self.batch_size:
             return
-        transitions = self.replay.sample(self.batch_size)
-        # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
-        # detailed explanation). This converts batch-array of Transitions
-        # to Transition of batch-arrays.
-        batch = ReplayMemory.Transition(*zip(*transitions))
+        with torch.autograd.detect_anomaly():
+            transitions = self.replay.sample(self.batch_size)
+            # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
+            # detailed explanation). This converts batch-array of Transitions
+            # to Transition of batch-arrays.
+            batch = ReplayMemory.Transition(*zip(*transitions))
 
-        # Compute a mask of non-final states and concatenate the batch elements
-        # (a final state would've been the one after which simulation ended)
-        # non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)),
-        #                               dtype=torch.bool)
-        # non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
-        state_batch = torch.cat(batch.state)
-        action_batch = torch.cat(batch.action)
-        reward_batch = torch.cat(batch.reward)
-        next_state_batch = torch.cat(batch.next_state)
+            # Compute a mask of non-final states and concatenate the batch elements
+            # (a final state would've been the one after which simulation ended)
+            # non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)),
+            #                               dtype=torch.bool)
+            # non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+            state_batch = torch.cat(batch.state)
+            action_batch = torch.cat(batch.action)
+            reward_batch = torch.cat(batch.reward)
+            next_state_batch = torch.cat(batch.next_state)
 
-        with torch.no_grad():
-            delta = reward_batch.unsqueeze(-1) - self.reward_tag + \
-                self.value(next_state_batch) - self.value(state_batch)
-            self.reward_tag += self.lr_reward * torch.sum(delta).item()
-        if self.reward_tag != 0:
-            tal = 1
-        self.update_critic(delta, state_batch)
-        self.update_actor(delta, state_batch, action_batch)
+            delta = torch.sum(
+                reward_batch.unsqueeze(-1) - self.reward_tag + self.value(next_state_batch) -
+                self.value(state_batch)).item()
+            self.reward_tag += self.lr_reward * delta
+
+            self.update_critic(delta, state_batch)
+            self.update_actor(delta, state_batch, action_batch)
 
     def update_actor(self, delta, state, action):
         pseudo_loss = self.loss_actor(delta, state, action)
         pseudo_loss_mean = torch.mean(pseudo_loss)
-        # self.print_gradgraph(pseudo_loss_mean.grad_fn)
+
         # update policy weights
         self.optimizer_actor.zero_grad()
         pseudo_loss_mean.backward()

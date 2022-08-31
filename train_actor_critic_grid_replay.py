@@ -13,7 +13,7 @@ if __name__ == "__main__":
     episode_step = 7
     lr_reward = 0.9
     lr_critic = 0.3
-    lr_actor = 0.1
+    lr_actor = 0.3
     p_array = [0.9, 0.1]
     k = 10
     p = 0.9
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     grid_h = 4
     seed = 42
     capacity = 1000
-    batch_size = 128
+    batch_size = 1
     rand_generator = np.random.RandomState(np.random.seed(seed))
     matrix_transition = GridMDP.build_matrix_transition(p, grid_w, grid_h)
     env = Environment(matrix_transition, rand_generator)

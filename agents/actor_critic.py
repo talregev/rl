@@ -39,7 +39,6 @@ class AgentActorCritic():
         return a
 
     def step(self, state, action, new_state, reward):
-
         delta = (reward - self.reward_tag + self.value(new_state) - self.value(state)).item()
         self.reward_tag += self.lr_reward * delta
         self.update_critic(delta, state)
