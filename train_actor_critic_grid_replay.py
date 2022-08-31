@@ -21,7 +21,7 @@ if __name__ == "__main__":
     grid_h = 4
     seed = 42
     capacity = 1000
-    batch_size = 1
+    batch_size = 2
     rand_generator = np.random.RandomState(np.random.seed(seed))
     matrix_transition = GridMDP.build_matrix_transition(p, grid_w, grid_h)
     env = Environment(matrix_transition, rand_generator)
