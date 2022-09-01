@@ -1,5 +1,5 @@
 import numpy as np
-from utils import Environment
+from environments.environment import Environment
 
 
 class Agent():

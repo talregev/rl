@@ -10,11 +10,11 @@ class GridMDP():
         # 2 up (decrease) 3 down (increase)
         num_actions = 4
         state_size = grid_w * grid_h
-        matrix_transition = np.zeros((num_actions, state_size, state_size, 2))
+        matrix_transition = np.zeros((num_actions, state_size, state_size, 2), dtype=np.float32)
 
         # Fill the probabilities
         # action 0: left
-        action_left = np.zeros((state_size, state_size, 2))
+        action_left = np.zeros((state_size, state_size, 2), dtype=np.float32)
         for i in range(state_size):
             column = i % grid_w
             if column > 0:
@@ -26,7 +26,7 @@ class GridMDP():
         matrix_transition[0] = action_left
 
         # action 1: right
-        action_right = np.zeros((state_size, state_size, 2))
+        action_right = np.zeros((state_size, state_size, 2), dtype=np.float32)
         for i in range(state_size):
             column = i % grid_w
 
@@ -39,7 +39,7 @@ class GridMDP():
         matrix_transition[1] = action_right
 
         # action 2: up
-        action_up = np.zeros((state_size, state_size, 2))
+        action_up = np.zeros((state_size, state_size, 2), dtype=np.float32)
         for i in range(state_size):
             row = i // grid_w
 
@@ -52,7 +52,7 @@ class GridMDP():
         matrix_transition[2] = action_up
 
         # action 3: down
-        action_down = np.zeros((state_size, state_size, 2))
+        action_down = np.zeros((state_size, state_size, 2), dtype=np.float32)
         for i in range(state_size):
             row = i // grid_w
 

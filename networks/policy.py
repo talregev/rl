@@ -19,5 +19,5 @@ class Policy(nn.Module):
         # Use the rectified-linear activation function over x
         x2 = F.relu(x1)
         x3 = self.fc2(x2)
-        output = F.softmax(x3, dim=0)
+        output = F.softmax(x3, dim=-1)
         return output
