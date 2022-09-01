@@ -97,35 +97,35 @@ class AgentSoftActorCriticReplay():
     def step(self):
         if len(self.replay) < self.batch_size:
             return
-        with torch.autograd.detect_anomaly():
-            transitions = self.replay.sample(self.batch_size)
-            # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
-            # detailed explanation). This converts batch-array of Transitions
-            # to Transition of batch-arrays.
-            batch = ReplayMemory.Transition(*zip(*transitions))
 
-            # Compute a mask of non-final states and concatenate the batch elements
-            # (a final state would've been the one after which simulation ended)
-            # non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)),
-            #                               dtype=torch.bool)
-            # non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
-            state_batch = torch.cat(batch.state)
-            action_batch = torch.cat(batch.action)
-            reward_batch = torch.cat(batch.reward)
-            next_state_batch = torch.cat(batch.next_state)
+        transitions = self.replay.sample(self.batch_size)
+        # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
+        # detailed explanation). This converts batch-array of Transitions
+        # to Transition of batch-arrays.
+        batch = ReplayMemory.Transition(*zip(*transitions))
 
-            self.update_critic(state_batch, action_batch, reward_batch, next_state_batch)
-            self.update_actor(state_batch)
+        # Compute a mask of non-final states and concatenate the batch elements
+        # (a final state would've been the one after which simulation ended)
+        # non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)),
+        #                               dtype=torch.bool)
+        # non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+        state_batch = torch.cat(batch.state)
+        action_batch = torch.cat(batch.action)
+        reward_batch = torch.cat(batch.reward)
+        next_state_batch = torch.cat(batch.next_state)
 
-            # Finally, update target networks by polyak averaging.
-            with torch.no_grad():
-                q_params = [self.q1.parameters(), self.q2.parameters()]
-                q_targets_params = [self.q1_target.parameters(), self.q2_target.parameters()]
-                for p, p_targ in zip(itertools.chain(*q_params), itertools.chain(*q_targets_params)):
-                    # NB: We use an in-place operations "mul_", "add_" to update target
-                    # params, as opposed to "mul" and "add", which would make new tensors.
-                    p_targ.data.mul_(self.polyak)
-                    p_targ.data.add_((1 - self.polyak) * p.data)
+        self.update_critic(state_batch, action_batch, reward_batch, next_state_batch)
+        self.update_actor(state_batch)
+
+        # Finally, update target networks by polyak averaging.
+        with torch.no_grad():
+            q_params = [self.q1.parameters(), self.q2.parameters()]
+            q_targets_params = [self.q1_target.parameters(), self.q2_target.parameters()]
+            for p, p_targ in zip(itertools.chain(*q_params), itertools.chain(*q_targets_params)):
+                # NB: We use an in-place operations "mul_", "add_" to update target
+                # params, as opposed to "mul" and "add", which would make new tensors.
+                p_targ.data.mul_(self.polyak)
+                p_targ.data.add_((1 - self.polyak) * p.data)
 
     def update_actor(self, state):
         pseudo_loss = self.loss_actor(state,)
