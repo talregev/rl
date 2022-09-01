@@ -9,7 +9,7 @@ from mdps.grid import GridMDP
 if __name__ == "__main__":
     print("tal")
 
-    episodes = 50000
+    episodes = 990000
     episode_step = 7
     lr_reward = 0.9
     lr_critic = 0.3
