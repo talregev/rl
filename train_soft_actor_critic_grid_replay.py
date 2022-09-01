@@ -5,6 +5,7 @@ from networks.policy import Policy
 from networks.qvalue import QValue
 from environments.environment import Environment
 from mdps.grid import GridMDP
+import torch
 
 if __name__ == "__main__":
     print("tal")
@@ -28,8 +29,10 @@ if __name__ == "__main__":
     matrix_transition = GridMDP.build_matrix_transition(p, grid_w, grid_h)
     env = Environment(matrix_transition, rand_generator)
     num_states, num_actions = env.get_num_states_actions()
-    policy = Policy(k, num_states, num_actions)
-    qvalue = QValue(k, num_states, num_actions)
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    policy = Policy(device, k, num_states, num_actions)
+    qvalue = QValue(device, k, num_states, num_actions)
+
     agent = AgentSoftActorCriticReplay(
         policy,
         qvalue,
@@ -42,6 +45,7 @@ if __name__ == "__main__":
         batch_size,
         gamma,
         polyak,
+        device,
     )
     controller = Controller(env, agent, episodes, episode_step)
     controller.train_replay()

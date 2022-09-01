@@ -21,6 +21,7 @@ class AgentSoftActorCriticReplay():
         batch_size,
         gamma,
         polyak,
+        device,
     ) -> None:
         self.rand_generator = rand_generator
         self.lr_critic = lr_critic
@@ -40,11 +41,13 @@ class AgentSoftActorCriticReplay():
         self.batch_size = batch_size
         self.gamma = gamma
         self.polyak = polyak
+        self.device = device
 
     def loss_actor(self, state):
         action_probabilities = self.policy(state).cpu().detach().numpy()
         next_actions = np.array([self.rand_generator.choice(self.num_actions, p=p) for p in action_probabilities])
-        p = torch.tensor(action_probabilities[np.arange(action_probabilities.shape[0]), next_actions]).unsqueeze(-1)
+        p = torch.tensor(action_probabilities[np.arange(action_probabilities.shape[0]), next_actions],
+                         device=self.device).unsqueeze(-1)
 
         q1_pi = self.q1(state, next_actions)
         q2_pi = self.q2(state, next_actions)
@@ -60,13 +63,17 @@ class AgentSoftActorCriticReplay():
         with torch.no_grad():
             action_probabilities = self.policy(next_state).cpu().detach().numpy()
             next_actions = np.array([self.rand_generator.choice(self.num_actions, p=p) for p in action_probabilities])
-            p = torch.tensor(action_probabilities[np.arange(action_probabilities.shape[0]), next_actions]).unsqueeze(-1)
+            p = torch.tensor(
+                action_probabilities[np.arange(action_probabilities.shape[0]), next_actions],
+                device=self.device,
+            ).unsqueeze(-1)
 
             q1_pi_target = self.q1_target(next_state, next_actions)
             q2_pi_target = self.q2_target(next_state, next_actions)
 
             q_pi_target = torch.min(q1_pi_target, q2_pi_target)
-            bellman = reward.unsqueeze(-1) + self.gamma * (q_pi_target - self.lr_critic * torch.log(p))
+            bellman = torch.tensor(
+                reward, device=self.device).unsqueeze(-1) + self.gamma * (q_pi_target - self.lr_critic * torch.log(p))
 
         loss_q1 = self.criterion(q1, bellman)
         loss_q2 = self.criterion(q2, bellman)
